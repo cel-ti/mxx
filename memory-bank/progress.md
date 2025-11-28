@@ -1,0 +1,13 @@
+# Progress
+- **Current Status:** Core utilities and data models are implemented and unit-tested. CLI commands exist for configuring app paths, managing Maa profiles (backup/restore/list/info/open/new), managing auto profiles (list/info/open/new/run), and rendering schedules.
+- **What Works:**
+  - JSON/TOML read-write helpers, nested dict CRUD, wildcard pattern logic, and zip import/export (validated by pytest).
+  - Maa backup pipeline that filters files/fields and applies overwrites before restore.
+  - Auto profile launcher that can optionally trigger LDPlayer before launching the MAA executable through detached subprocesses.
+  - Convenience commands to open config directories/files in the default editor.
+- **Outstanding Work:**
+  - Integration/CLI tests plus documentation showing real-world profile snippets.
+  - Hardening around filesystem errors (missing dirs, invalid TOML) beyond basic warnings.
+  - UX polish for scheduling output (export options, dry runs) and richer filtering operators.
+  - Evaluate plugin framework expectations and either scaffold APIs or drop the placeholder package.
+- **Blockers / Dependencies:** Optional process utilities still require installing the `[service]` extra; features depending on them must handle ImportError gracefully (currently enforced via `_check_available`).

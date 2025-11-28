@@ -1,0 +1,13 @@
+# Tech Context
+- **Language & Runtime:** Python 3.12+, Windows-focused (uses `os.startfile`, LDPlayer CLI, Win32 APIs for optional process utilities).
+- **Core Dependencies:**
+  - `click` for CLI surface.
+  - `pydantic v2` for typed config models and validation.
+  - `toml` + stdlib `json`, `zipfile`, `fnmatch`, `pathlib` for config management.
+- **Optional Extras:** `psutil`, `pywin32` (`win32gui`, `win32process`) unlock advanced process/window checks; `ldpx` listed in dev extras for interacting with LDPlayer.
+- **Packaging:** Single console script entry `mxx = mxx.click.main:cli` declared in `pyproject.toml`; built via `uv_build`.
+- **Testing:** Pytest suite under `tests/` covers JSON/TOML IO, file filters, nested dict helpers, and wildcard patterns. No integration tests yet for CLI/managers.
+- **Filesystem Layout:**
+  - `src/mxx/app|auto_profile|maaconfig|click|utils|plugin_system` for domain modules.
+  - `~/.mxx/config.json` (app config), `~/.mxx/maa/*.toml` (MAA profiles), `~/.mxx/profiles/*.toml` (auto profiles), `~/.mxx/backups` (zip artifacts).
+- **Execution Flow:** CLI commands import their managers lazily, so file system side effects (dir creation, profile loading) occur at import time; detached launches rely on Windows process flags.

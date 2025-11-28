@@ -1,0 +1,13 @@
+# System Patterns
+- **Layered CLI Architecture:** `mxx.click.main` registers sub-command groups (`app`, `maa`, `auto`, `schedule`) that delegate to manager singletons (`mxx.app.mgr.mxxmgr`, `mxx.maaconfig.mgr.mxxmaa`, `mxx.auto_profile.mgr.auto_profiles`).
+- **Home-Scoped Configuration Repos:** Every manager resolves paths under `~/.mxx` (e.g., `config.json`, `maa/*.toml`, `profiles/*.toml`, `backups/`). Directories are auto-created on import to guarantee predictable storage.
+- **Pydantic Models as Contracts:** Profiles (`MaaProfile`, `MaaConfig`, `MxxAutoProfile`, `MxxAppConfig`) encode validation, default factories, and allow arbitrary extras, enabling flexible CLI filters (see `schedule`).
+- **Selective Backup Pipeline:** `MaaProfile.backup/restore` composes utilities: `filter_files` (pattern-based file inclusion), `load_config_file`/`save_config_file`, `_filter_dict` (wildcard excludes via nested removal + fnmatch), `_apply_overwrite`, and `create_zip_from_dict`/`load_zip_to_dict` to persist curated payloads.
+- **Utility Toolbox:**
+  - `nested.py` centralizes CRUD for slash-delimited key paths.
+  - `pattern.py` wraps fnmatch semantics for key filtering.
+  - `file.py` harmonizes JSON/TOML IO and zipper helpers.
+  - `subprocess.py` launches detached commands (visible or hidden) to keep automation non-blocking.
+  - `process.py` (optional deps) inspects running processes/windows for advanced adapters.
+  - `resolveEditor.py` encapsulates "open in editor" logic, preferring VS Code.
+- **Extensibility Hooks:** Empty `mxx.plugin_system` namespace reserved for future injection points; CLI groups structured so new commands can be registered without altering the core entrypoint.

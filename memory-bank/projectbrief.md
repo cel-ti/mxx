@@ -1,0 +1,17 @@
+# Project Brief
+- **Purpose:** Provide a CLI toolkit for configuring, backing up, and orchestrating MAA (Mahjong Soul Assistant) style automation setups plus related auto-launch profiles.
+- **Key Capabilities:**
+  - Persist global app settings (profile and MAA config locations) via `mxx.app` manager.
+  - Model and manage per-app TOML profiles for MaaConfig (`mxx.maaconfig`) with selective backup/restore workflows that filter keys/files.
+  - Manage auto-run profiles that can launch LDPlayer and start MAA via detached subprocess helpers.
+  - Offer Click-based subcommands (`app`, `maa`, `auto`, `schedule`) for day-to-day operations.
+  - Provide reusable utilities for JSON/TOML IO, nested key manipulation, pattern filtering, process/window inspection, and zip packaging.
+- **Constraints & Assumptions:**
+  - Configuration lives under the user home directory (`~/.mxx`) and is expected to contain TOML definitions per profile.
+  - Works on Python ≥3.12 with Click + Pydantic 2; Windows conveniences (e.g., `os.startfile`, LDPlayer CLI) are assumed.
+  - Optional process-inspection helpers require extra dependencies (`psutil`, `pywin32`).
+- **Success Criteria:**
+  - Users can define profiles and run CLI flows without manually editing scattered files.
+  - Backup artifacts capture only intended config fragments and can be restored idempotently.
+  - Auto profiles reliably launch emulators/MAA with the configured wait/lifetime parameters.
+  - Utilities remain unit-tested (see `tests/`) to guard core data-manipulation behaviors.
