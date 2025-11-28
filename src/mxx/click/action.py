@@ -1,10 +1,19 @@
 
 import click
 
-@click.group()
-def action():
+@click.group(invoke_without_command=True)
+@click.option("--runtime", "-v", multiple=True, help="Runtime variables in key=value format")
+def action(runtime):
     """Run related commands"""
-    pass
+    from mxx.plugin_system.loader import mxx_plugin_loader
+    # Parse runtime variables into a dictionary
+    runtime_dict = {}
+    for rv in runtime:
+        if "=" in rv:
+            key, value = rv.split("=", 1)
+            runtime_dict[key] = value
+    # Set runtime in plugin loader
+    mxx_plugin_loader.runtime.update(runtime_dict)
 
 # run
 @action.command("run")
@@ -39,7 +48,7 @@ def kill_action(profile):
 @click.option("--sort", "-s", help="sort by a profile value (supports model_extra keys)")
 @click.option("--filter", "-f", help="filter by a profile value (by x=y)", multiple=True)
 @click.option("--grace", "-g", help="grace period between tasks in seconds", type=int, default=60)
-def run(sort, filter, grace):
+def schedule(sort, filter, grace):
     """Schedule auto tasks"""
     from mxx.auto_profile.mgr import auto_profiles
     
