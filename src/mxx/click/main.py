@@ -13,7 +13,6 @@ from mxx.auto_profile.mgr import auto_profiles
 mxxmaa.profiles.update(mxx_plugin_loader.loadMaaProfiles())
 auto_profiles.profiles.update(mxx_plugin_loader.loadProfiles())
 
-
 @click.group()
 def cli():
     """MXX Application Command Line Interface"""

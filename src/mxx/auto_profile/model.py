@@ -21,6 +21,9 @@ class MxxAutoProfile(BaseModel):
         """starts the auto"""
         # resolve
         from ..maaconfig.mgr import mxxmaa
+        for profile in mxxmaa.profiles.values():
+            profile.validate_path_exists()
+
         if self.maa not in mxxmaa.profiles:
             print(f"MAA app '{self.maa}' not found in configuration.")
             return

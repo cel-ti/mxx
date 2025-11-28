@@ -3,6 +3,8 @@ import datetime
 from pprint import pformat
 import click
 
+from mxx.utils.resolveEditor import resolve_editor
+
 @click.group()
 def maa():
     """maa framework commands"""
@@ -104,7 +106,8 @@ def open_maa(maa, backup):
 
 @maa.command("new", help="Create a new MAA app configuration")
 @click.argument("maa")
-def new_maa(maa):
+@click.argument("path")
+def new_maa(maa, path):
     """Create a new MAA app configuration"""
     from mxx.maaconfig.mgr import mxxmaa
     from mxx.utils.toml import save_toml
@@ -117,7 +120,7 @@ def new_maa(maa):
     from mxx.maaconfig.model import MaaProfile, MaaConfig
     
     profile = MaaProfile(
-        path="",
+        path=path,
         configFolder="config",
         config=MaaConfig(),
         app=""
@@ -132,3 +135,5 @@ def new_maa(maa):
     
     click.echo(f"Created MAA app configuration '{maa}' at {profile_path}")
     
+    # open
+    resolve_editor(profile_path)

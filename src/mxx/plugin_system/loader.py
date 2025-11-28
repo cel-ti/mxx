@@ -28,14 +28,17 @@ class MxxPluginLoader(PluginInterface):
     
     def loadProfiles(self):
         profiles = {}
+        from mxx.auto_profile.mgr import auto_profiles
         for plugin in self.plugins:
-            profiles.update(plugin.loadProfiles(self.runtime))
+            
+            profiles.update(plugin.loadProfiles(auto_profiles, self.runtime))
         return profiles
 
     def loadMaaProfiles(self):
         profiles = {}
+        from mxx.maaconfig.mgr import mxxmaa
         for plugin in self.plugins:
-            profiles.update(plugin.loadMaaProfiles(self.runtime))
+            profiles.update(plugin.loadMaaProfiles(mxxmaa, self.runtime))
         return profiles
     
     def preProfileStart(self, profile):

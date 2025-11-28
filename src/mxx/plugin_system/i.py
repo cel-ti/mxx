@@ -8,11 +8,11 @@ if TYPE_CHECKING:
 
 
 class PluginInterface:
-    def loadProfiles(self, ctx) -> Dict[str, "MxxAutoProfile"]:
+    def loadProfiles(self, mgr, ctx) -> Dict[str, "MxxAutoProfile"]:
         """Loads and returns a dictionary of auto profiles provided by this plugin"""
         return {}
     
-    def loadMaaProfiles(self, ctx) -> Dict[str, "MaaProfile"]:
+    def loadMaaProfiles(self, mgr, ctx) -> Dict[str, "MaaProfile"]:
         """Loads and returns a dictionary of MAA profiles provided by this plugin"""
         return {}
     

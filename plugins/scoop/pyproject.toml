@@ -1,0 +1,17 @@
+[project]
+name = "mxxp-scoop"
+version = "0.1.0"
+description = "MXX plugin to resolve Scoop app paths"
+readme = "README.md"
+authors = [
+    { name = "cel-ti", email = "96926560+cel-ti@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+mxxp-scoop = "mxxp_scoop:main"
+
+[build-system]
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"

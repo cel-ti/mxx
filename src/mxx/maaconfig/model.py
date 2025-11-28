@@ -18,22 +18,18 @@ class MaaProfile(BaseModel):
     configFolder : str = "config"
     config : MaaConfig = Field(default_factory=MaaConfig)
     
-
-    @field_validator('path')
-    @classmethod
-    def validate_path_exists(cls, v: str) -> str:
-        """Validate that the path exists (supports symlinks)."""
-        if not v:
+    def validate_path_exists(self) -> str:
+        if not self.path:
             raise ValueError("Path cannot be empty")
         
-        path = Path(v)
+        path = Path(self.path)
         
         # Check if path exists (follows symlinks to check target exists)
         if not path.exists():
-            raise ValueError(f"Path does not exist: {v}")
+            raise ValueError(f"Path does not exist: {self.path}")
         
         # Return the original path as-is (preserves symlinks)
-        return v
+        return self.path
 
     def _parse_exclude_string(self, exclude_str: str) -> Tuple[str, str]:
         """Parse exclude string like 'config.toml/key1..key2..key3' into filename and key path.
