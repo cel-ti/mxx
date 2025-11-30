@@ -1,0 +1,18 @@
+# MAA-Only Template
+# Use this template when you only need to configure MAA without LD
+# Profile name comes from the filename (e.g., myprofile.maa.toml → "myprofile.maa")
+
+[maa]
+# MAA application configuration
+
+# Optional: MAA installation directory
+# directory = "C:\\MAA-v5.10.0-beta.1"
+
+# Optional: MAA configuration file
+# config = "gui.json"
+
+# Optional: Resource directory (relative to MAA directory or absolute)
+# resource = "resource"
+
+# Optional: User data directory
+# user_path = "C:\\MAA_UserData"

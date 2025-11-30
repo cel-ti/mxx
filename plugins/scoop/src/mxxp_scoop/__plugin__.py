@@ -1,40 +1,43 @@
 import os
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Any
 
 from mxx.plugin_system.plugin import MxxPlugin
-from mxx.maaconfig.model import MaaProfile
+from mxx.models.profile import MxxProfile
 
 class ScoopPlugin(MxxPlugin):
-    def loadMaaProfiles(self, mgr, ctx) -> Dict[str, MaaProfile]:
-        """
-        Iterates through existing profiles in the manager.
-        If a profile's path starts with 'scoop', it resolves the path and updates the profile.
-        """
-        for name, profile in mgr.profiles.items():
-            path_val = profile.path
+    """Plugin to resolve MAA paths starting with 'scoop' to actual Scoop installation paths.
+    
+    Examples:
+        - directory = "scoop" → resolves using profile name as app name
+        - directory = "scoop:maa-beta" → resolves to maa-beta's installation
+    """
+    
+    def pre_profile_start(self, profile: MxxProfile, ctx: Dict[str, Any]) -> None:
+        """Resolve scoop paths before profile starts."""
+        if profile.maa and profile.maa.path:
+            path = profile.maa.path
             
-            if path_val and isinstance(path_val, str) and path_val.startswith("scoop"):
-                app_name = self._extract_app_name(path_val, name)
+            if isinstance(path, str) and path.startswith("scoop"):
+                # Extract app name from "scoop" or "scoop:app_name"
+                if path == "scoop":
+                    # Use profile name as app name
+                    app_name = getattr(profile, 'name', 'maa')
+                elif path.startswith("scoop:"):
+                    # Use specified app name
+                    app_name = path.split(":", 1)[1]
+                else:
+                    app_name = "maa"
+                
                 resolved_path = self._resolve_scoop_path(app_name)
                 
                 if resolved_path:
-                    print(f"ScoopPlugin: Resolving '{name}' path '{path_val}' -> '{resolved_path}'")
-                    profile.path = str(resolved_path)
+                    print(f"ScoopPlugin: Resolved '{path}' -> '{resolved_path}'")
+                    profile.maa.path = str(resolved_path)
                 else:
-                    print(f"ScoopPlugin: Warning - Could not resolve scoop app '{app_name}' for profile '{name}'")
-        
-        return {}
+                    print(f"ScoopPlugin: Warning - Could not resolve scoop app '{app_name}'")
 
-    def _extract_app_name(self, path_val: str, profile_name: str) -> str:
-        """Determine the app name from the path string or profile name."""
-        if path_val == "scoop":
-            return profile_name
-        elif path_val.startswith("scoop:"):
-            return path_val.split(":", 1)[1]
-        return profile_name
-
-    def _resolve_scoop_path(self, app_name: str) -> Optional[Path]:
+    def _resolve_scoop_path(self, app_name: str) -> Path | None:
         """Find the installation path for a Scoop app."""
         # 1. Try SCOOP environment variable
         scoop_root = os.environ.get("SCOOP")
