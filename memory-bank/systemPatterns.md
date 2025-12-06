@@ -26,8 +26,13 @@ See [details/sp_models_full.md](details/sp_models_full.md) for complete specific
 ## Plugin System
 - Singleton PluginLoader searches `mxxp_*` packages
 - Discovery from installed + `cwd/plugins/`
-- Hooks: pre_profile_start, post_profile_start, etc.
+- **Profile hooks**: pre_profile_start, post_profile_start, pre_profile_kill, post_profile_kill
+- **Command hooks**: pre_command, post_command, command_error
+- **CLI extension**: `register_commands(cli_group)` for adding commands
+- **Custom Click classes**: PluginAwareCommand, PluginAwareGroup wrap all commands
+- **Context passing**: plugin_loader available in ctx.obj for all commands
 - Scoop plugin resolves `path = "scoop:app"` → actual path
+- **Example plugins**: /plugins/ for development, /example/ for comprehensive documentation
 
 See [details/sp_plugin_system.md](details/sp_plugin_system.md) for details.
 

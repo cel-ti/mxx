@@ -1,17 +1,19 @@
 # Active Context
-- **Current Status (Nov 29 2025):**
+- **Current Status (Dec 6 2025):**
   - ✅ Architecture complete and tested
-  - ✅ Plugin system working (scoop plugin resolves paths)
+  - ✅ Enhanced plugin system with CLI command registration
+  - ✅ Plugin hooks for command execution (pre/post/error)
   - ✅ All configs migrated to new format
   - System ready for production use
 
 - **Latest Session:**
-  - Fixed scoop plugin to use `maa.path` instead of `maa.directory`
-  - Added plugin discovery from `cwd/plugins/` directory
-  - Installed plugins in editable mode for development
-  - Corrected `--kill` vs `--kill-all` behavior in `run up`
-  - Migrated all job configs to new profile format
-  - Removed vestigial `[profile]` sections from templates
+  - Implemented custom Click classes (PluginAwareCommand, PluginAwareGroup)
+  - Added `register_commands()` to PluginInterface for CLI extensibility
+  - Added command execution hooks: pre_command, post_command, command_error
+  - Created single-instance checker plugin (plugins/check-single-instance)
+  - Created test plugins (plugins/test-command, plugins/test-command-override)
+  - Created comprehensive example plugin at root (/example) for documentation
+  - All CLI commands now plugin-aware with context passing
 
 - **Current Behavior:**
   - `mxx run up <profile>` - Start and return immediately

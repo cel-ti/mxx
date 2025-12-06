@@ -77,6 +77,18 @@ class PluginLoader:
                 plugin.init()
             except Exception as e:
                 print(f"Warning: Plugin init failed: {e}")
+    
+    def register_commands(self, cli_group) -> None:
+        """Register commands from all plugins.
+        
+        Args:
+            cli_group: Click group to register commands with
+        """
+        for plugin in self.plugins:
+            try:
+                plugin.register_commands(cli_group)
+            except Exception as e:
+                print(f"Warning: Plugin register_commands failed: {e}")
 
     def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call pre_profile_start on all plugins.

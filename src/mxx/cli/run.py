@@ -4,11 +4,12 @@ import sys
 
 import click
 
+from mxx.cli.plugin_aware import PluginAwareGroup
 from mxx.core.profile_resolver import profile_resolver
 from mxx.core.runner import ProfileRunner
 
 
-@click.group()
+@click.group(cls=PluginAwareGroup)
 def run():
     """Run profile commands."""
     pass

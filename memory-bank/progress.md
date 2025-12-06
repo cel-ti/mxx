@@ -19,7 +19,11 @@
 ### **Plugin System**
 ✅ Singleton PluginLoader with cwd/plugins support
 ✅ Scoop plugin resolves `scoop:app_name` paths
-✅ Hook integration: pre_profile_start, etc.
+✅ Profile hooks: pre_profile_start, post_profile_start, pre_profile_kill, post_profile_kill
+✅ Command hooks: pre_command, post_command, command_error
+✅ CLI command registration via `register_commands(cli_group)`
+✅ Custom Click classes (PluginAwareCommand, PluginAwareGroup)
+✅ Context passing with plugin_loader in ctx.obj
 ✅ Editable plugin installation for development
 
 ### **CLI Commands**
@@ -36,7 +40,10 @@
 
 ### **Plugins Installed**
 ✅ mxxp-scoop - Resolves scoop app paths
-✅ mxxp-check-free - (ready for use)
+✅ mxxp-check-free - Prevents runs during fullscreen/high activity
+✅ mxxp-check-single-instance - Ensures only one MXX instance runs
+✅ mxxp-test-command - Example: adds test command
+✅ mxxp-test-command-override - Example: extends test command via hooks
 
 ## Current State
 - System tested and working in production

@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 import click
 
+from mxx.cli.plugin_aware import PluginAwareGroup
 from mxx.core.config import get_profile_path
 from mxx.core.profile_resolver import (
     profile_resolver,
@@ -113,7 +114,7 @@ def display_model_details(model: Any, name: str, is_plugin: bool) -> None:
         click.echo(config_path.read_text())
 
 
-@click.group()
+@click.group(cls=PluginAwareGroup)
 def config():
     """Manage configuration profiles."""
     pass

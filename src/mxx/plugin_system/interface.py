@@ -4,6 +4,7 @@ from typing import Dict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from mxx.models.profile import MxxProfile
+    import click
 
 
 class PluginInterface:
@@ -11,6 +12,14 @@ class PluginInterface:
     
     def init(self) -> None:
         """Initialize the plugin."""
+        pass
+    
+    def register_commands(self, cli_group: "click.Group") -> None:
+        """Register plugin commands with the CLI.
+        
+        Args:
+            cli_group: The main CLI group to add commands to
+        """
         pass
 
     def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:

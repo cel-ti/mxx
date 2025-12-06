@@ -1,0 +1,14 @@
+[project]
+name = "mxxp-test-command"
+version = "0.1.0"
+description = "Test plugin that adds a test command"
+readme = "README.md"
+authors = [
+    { name = "cel-ti", email = "96926560+cel-ti@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"
