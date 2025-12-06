@@ -1,0 +1,38 @@
+[2025-11-29 21:40:12.810][INF] Loading configuration file...
+[2025-11-29 21:40:13.360][INF] MFAWPF Version: [mfa.version=v1.3.4.0] Interface Version: [data.version=v1.16.2] 
+[2025-11-29 21:40:13.373][INF] 触控模式:Maatouch,捕获模式:Default
+[2025-11-29 21:40:13.818][INF] MFAWPF Version: [mfa.version=v1.3.4.0] Interface Version: [data.version=v1.16.2] 
+[2025-11-29 21:40:13.819][INF] 触控模式:Maatouch,捕获模式:Default
+[2025-11-29 21:40:13.819][INF] 触控模式:Maatouch,捕获模式:Default
+[2025-11-29 21:40:13.837][INF] 正在载入资源
+[2025-11-29 21:40:13.837][INF] Resource: C:\Users\GESTALT\scoop\apps\ga_gf2_cn\current\/resource/base
+[2025-11-29 21:40:13.847][INF] Connecting to Emulator......
+[2025-11-29 21:40:13.997][INF] GPU acceleration: Auto
+[2025-11-29 21:40:13.998][INF] AdbPath: A:/SYS/ldplayer/adb.exe
+[2025-11-29 21:40:13.998][INF] AdbSerial: emulator-5568
+[2025-11-29 21:40:13.998][INF] ScreenCap: Default
+[2025-11-29 21:40:13.998][INF] Input: Maatouch
+[2025-11-29 21:40:13.998][INF] Config: {"extras":{"ld":{"enable":true,"index":7,"path":"A:/SYS/ldplayer","pid":6452}}
+[2025-11-29 21:40:14.929][INF] 正在注册自定义识别器
+[2025-11-29 21:40:14.929][INF] 正在注册自定义行动
+[2025-11-29 21:40:14.937][INF] Trying to parse BatchRedeemCode
+[2025-11-29 21:40:15.617][INF] Trying to parse CommunityDailyHelper
+[2025-11-29 21:40:15.760][INF] Registering IMaaCustomAction BatchRedeemCode
+[2025-11-29 21:40:15.760][INF] Registering IMaaCustomAction CommunityDailyHelper
+[2025-11-29 21:40:16.108][INF] Screenshot time: 85ms(Default)
+[2025-11-29 21:40:16.108][INF] Starting task: 启动少女前线2
+[2025-11-29 21:41:03.307][INF] Starting task: 日常任务前准备
+[2025-11-29 21:42:14.658][INF] Starting task: 推图助手
+[2025-11-29 22:37:04.224][INF] Stopping......
+[2025-11-29 22:37:04.262][INF] Task has been abandoned
+[2025-11-29 22:37:16.712][INF] MFAWPF Version: [mfa.version=v1.3.4.0] Interface Version: [data.version=v1.16.2] 
+[2025-11-29 22:37:16.713][INF] 触控模式:Maatouch,捕获模式:Default
+[2025-11-29 22:37:16.714][INF] 触控模式:Maatouch,捕获模式:Default
+[2025-11-29 22:37:16.717][INF] Connecting to Emulator......
+[2025-11-29 22:37:17.312][INF] Screenshot time: 148ms(Default)
+[2025-11-29 22:37:17.313][INF] Starting task: 启动少女前线2
+[2025-11-29 22:37:19.726][INF] Starting task: 日常任务前准备
+[2025-11-29 22:38:18.166][INF] Starting task: 循环助手
+[2025-11-29 22:38:44.386][INF] Starting task: 领取奖励
+[2025-11-29 22:42:30.901][INF] Stopping......
+[2025-11-29 22:42:31.552][INF] Task has been abandoned

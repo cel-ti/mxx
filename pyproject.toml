@@ -1,0 +1,36 @@
+[project]
+name = "mxx"
+version = "0.1.1"
+description = "maa framework tools"
+readme = "README.md"
+authors = [
+    { name = "cel-ti", email = "96926560+cel-ti@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.3.1",
+    "psutil>=7.1.3",
+    "toml>=0.10.2",
+]
+
+[project.scripts]
+mxx = "mxx.cli.main:cli"
+
+[build-system]
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "keyring>=25.7.0",
+    "ldpx>=0.3.0",
+    "pytest>=9.0.1",
+]
+test = [
+    "pytest>=9.0.1",
+]
+
+[tool.uv.workspace]
+members = [
+    "plugins/check-free",
+]

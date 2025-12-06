@@ -1,0 +1,11 @@
+# LD-Only Template
+# Use this template when you only need to configure LD Player
+# Profile name comes from the filename (e.g., myprofile.ld.toml → "myprofile.ld")
+
+[ld]
+# LD Player instance configuration
+index = 0  # LD Player index (0, 1, 2, ...)
+# wait = 30  # Optional: wait time in seconds after starting LD
+
+# Optional: Override LD directory
+# directory = "C:\\leidian\\LDPlayer9"

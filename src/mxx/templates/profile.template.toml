@@ -1,0 +1,26 @@
+# Profile Template - Combined LD + MAA Configuration
+# Edit this file to configure your LD instance and MAA application
+# Profile name comes from the filename (e.g., myprofile.toml → "myprofile")
+
+[ld]
+# LD Player instance configuration
+index = 0  # LD Player index (0, 1, 2, ...)
+# wait = 30  # Optional: wait time in seconds after starting LD
+
+# Optional: Override LD directory
+# directory = "C:\\leidian\\LDPlayer9"
+
+[maa]
+# MAA application configuration
+
+# Optional: MAA installation directory
+# directory = "C:\\MAA-v5.10.0-beta.1"
+
+# Optional: MAA configuration file
+# config = "gui.json"
+
+# Optional: Resource directory (relative to MAA directory or absolute)
+# resource = "resource"
+
+# Optional: User data directory
+# user_path = "C:\\MAA_UserData"
