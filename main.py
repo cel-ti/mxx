@@ -1,6 +1,5 @@
-"""Entry point for mxx CLI application."""
+import psutil
 
-from mxx.cli import cli
-
-if __name__ == "__main__":
-    cli()
+for proc in psutil.process_iter(['pid', 'name', 'username']):
+    if proc.info['name'] == 'mxx.exe':
+        

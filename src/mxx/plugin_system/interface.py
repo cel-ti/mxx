@@ -9,6 +9,10 @@ if TYPE_CHECKING:
 class PluginInterface:
     """Base interface for MXX plugins."""
     
+    def init(self) -> None:
+        """Initialize the plugin."""
+        pass
+
     def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Hook called before a profile starts.
         

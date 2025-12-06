@@ -33,4 +33,5 @@ test = [
 [tool.uv.workspace]
 members = [
     "plugins/check-free",
+    "plugins/check-single-instance",
 ]

@@ -70,6 +70,14 @@ class PluginLoader:
             except Exception as e:
                 print(f"Warning: Plugin hook '{hook_name}' failed: {e}")
     
+    def init(self) -> None:
+        """Initialize all plugins."""
+        for plugin in self.plugins:
+            try:
+                plugin.init()
+            except Exception as e:
+                print(f"Warning: Plugin init failed: {e}")
+
     def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call pre_profile_start on all plugins.
         

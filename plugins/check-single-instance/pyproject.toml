@@ -1,0 +1,19 @@
+[project]
+name = "mxxp-check-single-instance"
+version = "0.1.0"
+description = "Ensures only one instance of MXX is running at a time"
+readme = "README.md"
+authors = [
+    { name = "cel-ti", email = "96926560+cel-ti@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "psutil>=5.9.0"
+]
+
+[project.scripts]
+check-single-instance = "mxxp_check_single_instance:main"
+
+[build-system]
+requires = ["uv_build>=0.9.13,<0.10.0"]
+build-backend = "uv_build"
