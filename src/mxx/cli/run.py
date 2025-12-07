@@ -37,6 +37,12 @@ def up(profiles: tuple[str, ...], waittime: int | None, kill: bool, kill_all: bo
     for profile_name in profiles:
         try:
             profile, is_plugin = profile_resolver.get_profile(profile_name)
+            
+            # Update plugin loader context with current profile name
+            current_context = profile_resolver.plugin_loader.context.copy()
+            current_context['profile_name'] = profile_name
+            profile_resolver.plugin_loader.set_context(current_context)
+            
             source = "[PLUGIN]" if is_plugin else ""
             
             # Validate before starting

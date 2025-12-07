@@ -3,17 +3,20 @@
   - ✅ Architecture complete and tested
   - ✅ Enhanced plugin system with CLI command registration
   - ✅ Plugin hooks for command execution (pre/post/error)
+  - ✅ Context variable system with `--var` arguments
+  - ✅ Completion tracking plugin operational
   - ✅ All configs migrated to new format
   - System ready for production use
 
 - **Latest Session:**
-  - Implemented custom Click classes (PluginAwareCommand, PluginAwareGroup)
-  - Added `register_commands()` to PluginInterface for CLI extensibility
-  - Added command execution hooks: pre_command, post_command, command_error
-  - Created single-instance checker plugin (plugins/check-single-instance)
-  - Created test plugins (plugins/test-command, plugins/test-command-override)
-  - Created comprehensive example plugin at root (/example) for documentation
-  - All CLI commands now plugin-aware with context passing
+  - Implemented `--var` argument extraction before Click processing
+  - Created `arg_extract.py` to parse `--var key=value` or `--var flag` (boolean=true)
+  - Context stored in PluginLoader and passed to all hooks
+  - Created completion tracking plugin (plugins/check-completion)
+  - Completion plugin prevents duplicate profile runs per day
+  - Added `--var by-completion` flag to enable completion tracking
+  - Added `--var reset-completion` flag to reset completion status
+  - Context includes vars and profile_name available to all plugins
 
 - **Current Behavior:**
   - `mxx run up <profile>` - Start and return immediately

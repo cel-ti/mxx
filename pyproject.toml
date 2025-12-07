@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mxx = "mxx.cli.main:cli"
+mxx = "mxx.cli.main:main"
 
 [build-system]
 requires = ["uv_build>=0.9.11,<0.10.0"]
@@ -34,4 +34,5 @@ test = [
 members = [
     "plugins/check-free",
     "plugins/check-single-instance",
+    "plugins/check-completion",
 ]

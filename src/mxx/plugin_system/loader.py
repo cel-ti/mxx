@@ -27,8 +27,17 @@ class PluginLoader:
         if not self._initialized:
             self.plugins: List[MxxPlugin] = []
             self._plugin_profiles: Dict[str, "MxxProfile"] = {}
+            self.context: Dict[str, Any] = {}  # Runtime context storage
             self._discover_plugins()
             PluginLoader._initialized = True
+    
+    def set_context(self, context: Dict[str, Any]) -> None:
+        """Set the runtime context.
+        
+        Args:
+            context: Dictionary containing runtime context (vars, profile_name, etc.)
+        """
+        self.context = context
     
     def _discover_plugins(self) -> None:
         """Discover and load all available plugins.
@@ -98,88 +107,97 @@ class PluginLoader:
             except Exception as e:
                 print(f"Warning: Plugin hook '{hook_name}' failed: {e}")
     
-    def init(self, vars: Dict[str, str] = None) -> None:
-        """Initialize all plugins.
-        
-        Args:
-            vars: Optional variables from --var options
-        """
+    def init(self) -> None:
+        """Initialize all plugins with context vars."""
+        vars_dict = self.context.get('vars', {})
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.init, vars=vars)
+                self._call_with_inspection(plugin.init, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin init failed: {e}")
     
-    def register_commands(self, cli_group, vars: Dict[str, str] = None) -> None:
-        """Register commands from all plugins.
+    def register_commands(self, cli_group) -> None:
+        """Register commands from all plugins with context vars.
         
         Args:
             cli_group: Click group to register commands with
-            vars: Optional variables from --var options
         """
+        vars_dict = self.context.get('vars', {})
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.register_commands, cli_group, vars=vars)
+                self._call_with_inspection(plugin.register_commands, cli_group, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin register_commands failed: {e}")
 
-    def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
+    def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call pre_profile_start on all plugins.
         
         Args:
             profile: Profile being started
             ctx: Runtime context
-            vars: Optional variables from --var options
         """
+        # Merge stored context (including vars and profile_name) with runtime context
+        merged_ctx = {**self.context, **ctx}
+        vars_dict = merged_ctx.get('vars', {})
+        
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.pre_profile_start, profile, ctx, vars=vars)
+                self._call_with_inspection(plugin.pre_profile_start, profile, merged_ctx, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin pre_profile_start failed: {e}")
     
-    def post_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
+    def post_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call post_profile_start on all plugins.
         
         Args:
             profile: Profile that was started
             ctx: Runtime context
-            vars: Optional variables from --var options
         """
+        # Merge stored context (including vars and profile_name) with runtime context
+        merged_ctx = {**self.context, **ctx}
+        vars_dict = merged_ctx.get('vars', {})
+        
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.post_profile_start, profile, ctx, vars=vars)
+                self._call_with_inspection(plugin.post_profile_start, profile, merged_ctx, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin post_profile_start failed: {e}")
     
-    def pre_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
+    def pre_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call pre_profile_kill on all plugins.
         
         Args:
             profile: Profile being killed
             ctx: Runtime context
-            vars: Optional variables from --var options
         """
+        # Merge stored context with runtime context
+        merged_ctx = {**self.context, **ctx}
+        vars_dict = merged_ctx.get('vars', {})
+        
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.pre_profile_kill, profile, ctx, vars=vars)
+                self._call_with_inspection(plugin.pre_profile_kill, profile, merged_ctx, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin pre_profile_kill failed: {e}")
     
-    def post_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
+    def post_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call post_profile_kill on all plugins.
         
         Args:
             profile: Profile that was killed
             ctx: Runtime context
-            vars: Optional variables from --var options
         """
+        # Merge stored context with runtime context
+        merged_ctx = {**self.context, **ctx}
+        vars_dict = merged_ctx.get('vars', {})
+        
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.post_profile_kill, profile, ctx, vars=vars)
+                self._call_with_inspection(plugin.post_profile_kill, profile, merged_ctx, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin post_profile_kill failed: {e}")
     
-    def can_run_profile(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> bool:
+    def can_run_profile(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> bool:
         """Check if profile can run via all plugins.
         
         If any plugin returns False, the profile cannot run.
@@ -187,21 +205,24 @@ class PluginLoader:
         Args:
             profile: Profile to check
             ctx: Runtime context
-            vars: Optional variables from --var options
             
         Returns:
             True if all plugins allow running, False otherwise
         """
+        # Merge stored context with runtime context
+        merged_ctx = {**self.context, **ctx}
+        vars_dict = merged_ctx.get('vars', {})
+        
         for plugin in self.plugins:
             try:
-                result = self._call_with_inspection(plugin.can_run_profile, profile, ctx, vars=vars)
+                result = self._call_with_inspection(plugin.can_run_profile, profile, merged_ctx, vars=vars_dict)
                 if not result:
                     return False
             except Exception as e:
                 print(f"Warning: Plugin can_run_profile check failed: {e}")
         return True
     
-    def can_kill_profile(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> bool:
+    def can_kill_profile(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> bool:
         """Check if profile can be killed via all plugins.
         
         If any plugin returns False, the profile cannot be killed.
@@ -209,27 +230,27 @@ class PluginLoader:
         Args:
             profile: Profile to check
             ctx: Runtime context
-            vars: Optional variables from --var options
             
         Returns:
             True if all plugins allow killing, False otherwise
         """
+        # Merge stored context with runtime context
+        merged_ctx = {**self.context, **ctx}
+        vars_dict = merged_ctx.get('vars', {})
+        
         for plugin in self.plugins:
             try:
-                result = self._call_with_inspection(plugin.can_kill_profile, profile, ctx, vars=vars)
+                result = self._call_with_inspection(plugin.can_kill_profile, profile, merged_ctx, vars=vars_dict)
                 if not result:
                     return False
             except Exception as e:
                 print(f"Warning: Plugin can_kill_profile check failed: {e}")
         return True
     
-    def load_plugin_profiles(self, vars: Dict[str, str] = None) -> Dict[str, "MxxProfile"]:
+    def load_plugin_profiles(self) -> Dict[str, "MxxProfile"]:
         """Load profiles contributed by plugins.
         
         Calls get_profiles() on each plugin and aggregates the results.
-        
-        Args:
-            vars: Optional variables from --var options
         
         Returns:
             Dictionary mapping profile names to MxxProfile instances
@@ -237,9 +258,10 @@ class PluginLoader:
         if self._plugin_profiles:
             return self._plugin_profiles
         
+        vars_dict = self.context.get('vars', {})
         for plugin in self.plugins:
             try:
-                profiles = self._call_with_inspection(plugin.get_profiles, vars=vars)
+                profiles = self._call_with_inspection(plugin.get_profiles, vars=vars_dict)
                 if profiles:
                     self._plugin_profiles.update(profiles)
                     print(f"Loaded {len(profiles)} profile(s) from plugin: {plugin.__class__.__name__}")

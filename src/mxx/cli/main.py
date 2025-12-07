@@ -1,9 +1,11 @@
 """Main CLI entry point for mxx."""
 
+import sys
 import click
 from mxx.cli import config, run
 from mxx.cli.plugin_aware import PluginAwareGroup
 from mxx.core.profile_resolver import profile_resolver
+from mxx.utils.nofuss.arg_extract import extract_var_args
 
 
 @click.group(cls=PluginAwareGroup)
@@ -18,10 +20,22 @@ def cli(ctx):
 cli.add_command(config.config)
 cli.add_command(run.run)
 
-# Note: Plugin init and register_commands will get vars from context at runtime
-# For now, initialize without vars (vars are passed per-command via context)
-profile_resolver.plugin_loader.init()
-profile_resolver.plugin_loader.register_commands(cli)
+
+def main():
+    """Main entry point that extracts --var before Click processes arguments."""
+    # Extract --var arguments before Click sees them
+    cleaned_argv, vars_dict = extract_var_args(sys.argv)
+    
+    # Set vars in plugin loader context immediately
+    profile_resolver.plugin_loader.set_context({'vars': vars_dict})
+    
+    # Initialize plugins with vars available
+    profile_resolver.plugin_loader.init()
+    profile_resolver.plugin_loader.register_commands(cli)
+    
+    # Run Click with cleaned arguments
+    cli(cleaned_argv[1:], standalone_mode=False)
+
 
 if __name__ == "__main__":
-    cli()
+    main()

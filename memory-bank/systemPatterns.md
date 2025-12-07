@@ -30,8 +30,13 @@ See [details/sp_models_full.md](details/sp_models_full.md) for complete specific
 - **Command hooks**: pre_command, post_command, command_error
 - **CLI extension**: `register_commands(cli_group)` for adding commands
 - **Custom Click classes**: PluginAwareCommand, PluginAwareGroup wrap all commands
-- **Context passing**: plugin_loader available in ctx.obj for all commands
+- **Context system**: 
+  - `--var` args extracted before Click processing (`arg_extract.py`)
+  - Context stored in PluginLoader.context with vars and profile_name
+  - All hooks receive merged context dictionary
+  - Boolean flags: `--var flag` → `flag=true`, `--var key=value` → `key: value`
 - Scoop plugin resolves `path = "scoop:app"` → actual path
+- **Completion tracking**: plugins/check-completion prevents duplicate daily runs
 - **Example plugins**: /plugins/ for development, /example/ for comprehensive documentation
 
 See [details/sp_plugin_system.md](details/sp_plugin_system.md) for details.
@@ -40,7 +45,7 @@ See [details/sp_plugin_system.md](details/sp_plugin_system.md) for details.
 ```bash
 mxx config new <name> [--template]  # Create from template
 mxx config cat [name]                # List/display configs
-mxx run up <profile> [--kill|--kill-all]  # Start profile
+mxx run up <profile> [--kill|--kill-all] [--var KEY=VALUE]  # Start profile
 mxx run down [profile...]            # Kill processes
 ```
 
@@ -48,6 +53,12 @@ mxx run down [profile...]            # Kill processes
 - Default: Start and return immediately
 - `--kill`: Wait for `lifetime`, kill profile
 - `--kill-all`: Wait for `lifetime`, kill all processes
+
+**Context variables** (`--var` flags):
+- `--var by-completion`: Enable completion tracking (skip if already completed today)
+- `--var reset-completion`: Reset completion status for profile
+- `--var KEY=VALUE`: Pass custom key-value pairs to plugins
+- `--var FLAG`: Boolean flag (automatically set to "true")
 
 ## Atomic Functions
 Small, testable functions:
