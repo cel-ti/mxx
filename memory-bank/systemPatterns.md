@@ -35,8 +35,15 @@ See [details/sp_models_full.md](details/sp_models_full.md) for complete specific
   - Context stored in PluginLoader.context with vars and profile_name
   - All hooks receive merged context dictionary
   - Boolean flags: `--var flag` → `flag=true`, `--var key=value` → `key: value`
+  - `profile_failed` flag set in context when processes fail during lifetime
 - Scoop plugin resolves `path = "scoop:app"` → actual path
-- **Completion tracking**: plugins/check-completion prevents duplicate daily runs
+- **Completion tracking**: plugins/check-completion tracks success/failure
+  - Records `true` (success) or `false` (failure) in daily JSON
+  - By default, only successful runs prevent re-execution
+  - `--var include-failed` to skip any completed run (success or failure)
+- **Process monitoring**: `sleep_with_countdown()` checks LD (ldpx) and MAA (psutil) every 10s
+  - Failure counter tracks consecutive failures (max 10)
+  - Returns False and sets `profile_failed=True` on failure
 - **Example plugins**: /plugins/ for development, /example/ for comprehensive documentation
 
 See [details/sp_plugin_system.md](details/sp_plugin_system.md) for details.

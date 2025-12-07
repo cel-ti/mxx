@@ -8,15 +8,17 @@
   - ✅ All configs migrated to new format
   - System ready for production use
 
-- **Latest Session:**
-  - Implemented `--var` argument extraction before Click processing
-  - Created `arg_extract.py` to parse `--var key=value` or `--var flag` (boolean=true)
-  - Context stored in PluginLoader and passed to all hooks
-  - Created completion tracking plugin (plugins/check-completion)
-  - Completion plugin prevents duplicate profile runs per day
-  - Added `--var by-completion` flag to enable completion tracking
-  - Added `--var reset-completion` flag to reset completion status
-  - Context includes vars and profile_name available to all plugins
+- **Latest Session (Dec 6 2025):**
+  - Implemented process monitoring during profile lifetime
+  - `sleep_with_countdown()` now checks LD (via ldpx) and MAA processes every 10s
+  - Failure counter tracks consecutive failures (max 10)
+  - Returns False on failure, sets `profile_failed=True` in context
+  - Completion tracking now records success/failure status
+  - JSON format: `{"profile": true}` (success) or `{"profile": false}` (failed)
+  - By default, only successful runs prevent re-execution
+  - `--var include-failed` flag to skip even if previous run failed
+  - Auto-retry pattern: failed runs allow retry, successful runs skip
+  - Dev-install script auto-bumps plugin micro versions
 
 - **Current Behavior:**
   - `mxx run up <profile>` - Start and return immediately

@@ -29,8 +29,8 @@ def up(profiles: tuple[str, ...], waittime: int | None, kill: bool, kill_all: bo
         kill: Kill the specific profile after lifetime
         kill_all: Kill all processes after lifetime
     """
-    import time
     from mxx.core.parser import validate_profile
+    from mxx.utils.nofuss.sleep import sleep_with_countdown
     
     runner = ProfileRunner(profile_resolver.plugin_loader)
     
@@ -59,8 +59,17 @@ def up(profiles: tuple[str, ...], waittime: int | None, kill: bool, kill_all: bo
             # Handle lifetime and killing
             if kill or kill_all:
                 if profile.lifetime:
-                    click.echo(f"Profile will run for {profile.lifetime}s")
-                    time.sleep(profile.lifetime)
+                    success = sleep_with_countdown(profile.lifetime, profile, f"Profile '{profile_name}' running")
+                    
+                    # Update context to mark failure if processes terminated early
+                    if not success:
+                        current_context = profile_resolver.plugin_loader.context.copy()
+                        current_context['profile_failed'] = True
+                        current_context['profile_name'] = profile_name
+                        profile_resolver.plugin_loader.set_context(current_context)
+                        
+                        click.echo(f"✗ Profile '{profile_name}' failed during execution", err=True)
+                        sys.exit(1)
                     
                     if kill_all:
                         click.echo("Lifetime expired, stopping all processes...")

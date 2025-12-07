@@ -38,7 +38,7 @@ class CheckCompletionPlugin(MxxPlugin):
         """Load today's completion records.
         
         Returns:
-            Dictionary mapping profile names to completion status
+            Dictionary mapping profile names to completion status (True=success, False=failed)
         """
         completion_file = self._get_completion_file()
         if completion_file.exists():
@@ -49,14 +49,15 @@ class CheckCompletionPlugin(MxxPlugin):
                 return {}
         return {}
     
-    def _save_completion(self, profile_name: str) -> None:
+    def _save_completion(self, profile_name: str, success: bool = True) -> None:
         """Mark a profile as completed for today.
         
         Args:
             profile_name: Name of the profile to mark as completed
+            success: True if successful, False if failed
         """
         completions = self._load_completions()
-        completions[profile_name] = True
+        completions[profile_name] = success
         
         completion_file = self._get_completion_file()
         try:
@@ -65,17 +66,28 @@ class CheckCompletionPlugin(MxxPlugin):
         except IOError as e:
             print(f"[CheckCompletion] Warning: Could not save completion: {e}")
     
-    def _is_completed(self, profile_name: str) -> bool:
+    def _is_completed(self, profile_name: str, include_failed: bool = False) -> bool:
         """Check if a profile has been completed today.
         
         Args:
             profile_name: Name of the profile to check
+            include_failed: If True, also consider failed runs as completed
             
         Returns:
-            True if already completed today, False otherwise
+            True if already completed today (and optionally failed), False otherwise
         """
         completions = self._load_completions()
-        return completions.get(profile_name, False)
+        status = completions.get(profile_name)
+        
+        if status is None:
+            return False
+        
+        # If include_failed is True, any recorded run (True or False) counts as completed
+        if include_failed:
+            return True
+        
+        # Otherwise, only True (successful) runs count as completed
+        return status is True
     
     def _reset_completion(self, profile_name: str) -> None:
         """Reset completion status for a specific profile.
@@ -120,22 +132,29 @@ class CheckCompletionPlugin(MxxPlugin):
         if vars.get('by-completion') != 'true':
             return
         
+        # Check if include-failed option is set
+        include_failed = vars.get('include-failed') == 'true'
+        
         # Check if already completed today
-        if self._is_completed(profile_name):
-            print(f"[CheckCompletion] Profile '{profile_name}' already completed today.")
+        if self._is_completed(profile_name, include_failed=include_failed):
+            completions = self._load_completions()
+            status = completions.get(profile_name)
+            status_text = "successfully" if status else "with failure"
+            
+            print(f"[CheckCompletion] Profile '{profile_name}' already completed today {status_text}.")
             print(f"[CheckCompletion] Completion file: {self._get_completion_file()}")
             print("[CheckCompletion] Skipping execution.")
             sys.exit(0)  # Exit early without error
         
         print(f"[CheckCompletion] Profile '{profile_name}' not yet completed today.")
-        print("[CheckCompletion] Will track completion after successful run.")
+        print("[CheckCompletion] Will track completion after run.")
     
     def post_profile_start(self, profile, ctx: Dict[str, Any]) -> None:
         """Record completion after profile starts successfully.
         
         Args:
             profile: Profile that was started
-            ctx: Runtime context (contains 'profile_name' and 'vars')
+            ctx: Runtime context (contains 'profile_name', 'vars', and 'profile_failed')
         """
         # Get vars from context
         vars = ctx.get('vars', {})
@@ -149,9 +168,16 @@ class CheckCompletionPlugin(MxxPlugin):
         if not profile_name:
             return
         
-        # Mark as completed
-        self._save_completion(profile_name)
-        print(f"[CheckCompletion] Marked '{profile_name}' as completed for today.")
+        # Check if profile failed during execution
+        failed = ctx.get('profile_failed', False)
+        
+        # Mark as completed with success/failure status
+        self._save_completion(profile_name, success=not failed)
+        
+        if failed:
+            print(f"[CheckCompletion] Marked '{profile_name}' as failed for today.")
+        else:
+            print(f"[CheckCompletion] Marked '{profile_name}' as completed successfully for today.")
 
 
 plugin = CheckCompletionPlugin()

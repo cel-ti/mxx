@@ -45,11 +45,33 @@
 ✅ mxxp-test-command - Example: adds test command
 ✅ mxxp-test-command-override - Example: extends test command via hooks
 
+## Recent Additions (Dec 6 2025)
+
+### **Process Monitoring**
+✅ `sleep_with_countdown()` monitors LD and MAA processes
+✅ Checks every 10 seconds using ldpx and psutil
+✅ Failure counter (max 10 consecutive failures)
+✅ Returns success/failure status
+✅ Sets `profile_failed=True` in context on failure
+✅ Supports KeyboardInterrupt for manual cancellation
+
+### **Enhanced Completion Tracking**
+✅ Records success (true) or failure (false) in JSON
+✅ Default behavior: only skip successful runs
+✅ `--var include-failed` flag to skip any completed run
+✅ Auto-retry pattern for scheduled tasks
+✅ Comprehensive README documentation
+
+### **Development Tools**
+✅ dev-install.ps1 auto-bumps plugin micro versions
+
 ## Current State
 - System tested and working in production
 - 4 main profiles configured (maa, maag)
 - 4 job profiles configured (gf2_cn, gf2_gl, re1999_cn, re1999_na)
 - All using scoop plugin for MAA path resolution
+- Process monitoring active during lifetime waits
+- Completion tracking with success/failure status
 
 ## Outstanding
 - Scheduling system for job profiles

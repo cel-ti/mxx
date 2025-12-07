@@ -13,8 +13,40 @@ Unified profile management for LD (LDPlayer) and MAA (MAA Assistant Arknights).
 
 ## Installation
 
+### Install MXX
+
 ```bash
+pip install mxx-tool
+```
+
+### Install Plugins
+
+```bash
+# Install from git repository
+pip install git+https://github.com/cel-ti/mxx.git#subdirectory=plugins/check-completion
+pip install git+https://github.com/cel-ti/mxx.git#subdirectory=plugins/scoop
+pip install git+https://github.com/cel-ti/mxx.git#subdirectory=plugins/check-single-instance
+
+# Or install all plugins at once
+pip install git+https://github.com/cel-ti/mxx.git#subdirectory=plugins/check-completion \
+            git+https://github.com/cel-ti/mxx.git#subdirectory=plugins/scoop \
+            git+https://github.com/cel-ti/mxx.git#subdirectory=plugins/check-single-instance
+```
+
+### Development Installation
+
+```bash
+# Clone repository
+git clone https://github.com/cel-ti/mxx.git
+cd mxx
+
+# Install in editable mode
 pip install -e .
+
+# Install plugins in editable mode
+pip install -e plugins/check-completion
+pip install -e plugins/scoop
+pip install -e plugins/check-single-instance
 ```
 
 ## Quick Start
@@ -80,8 +112,9 @@ mxx run up profile --var by-completion --var reset-completion
 
 ### Built-in Variables
 
-- `by-completion`: Enable completion tracking (skip if already run today)
+- `by-completion`: Enable completion tracking (skip if already run successfully today)
 - `reset-completion`: Reset completion status for profile
+- `include-failed`: Include failed runs when checking completion (skip even if previous run failed)
 
 ## Plugin System
 
@@ -117,14 +150,22 @@ plugin = MyPlugin()
 Save as `mxxp_myplugin/__plugin__.py` and install:
 
 ```bash
+# Development installation
 pip install -e ./mxxp_myplugin
-```
 
+# Or install from git
+pip install git+https://github.com/yourusername/repo.git#subdirectory=plugins/myplugin
+```
 ### Built-in Plugins
 
-- **check-completion**: Track daily profile completions
+- **check-completion**: Track daily profile completions with success/failure status
+  - Records `true` for successful runs, `false` for failed runs
+  - By default, only successful runs prevent re-execution
+  - Use `--var include-failed` to skip any completed run
+  - Perfect for auto-retry patterns in scheduled tasks
 - **check-single-instance**: Prevent multiple mxx instances
 - **scoop**: Resolve scoop app paths
+- **check-free**: Check LD console availability
 - **check-free**: Check LD console availability
 
 ## Configuration
