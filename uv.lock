@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 members = [
     "mxx",
     "mxxp-check-free",
+    "mxxp-check-single-instance",
 ]
 
 [[package]]
@@ -238,6 +239,17 @@ test = [{ name = "pytest", specifier = ">=9.0.1" }]
 name = "mxxp-check-free"
 version = "0.1.0"
 source = { editable = "plugins/check-free" }
+
+[[package]]
+name = "mxxp-check-single-instance"
+version = "0.1.0"
+source = { editable = "plugins/check-single-instance" }
+dependencies = [
+    { name = "psutil" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "psutil", specifier = ">=5.9.0" }]
 
 [[package]]
 name = "packaging"

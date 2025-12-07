@@ -2,6 +2,7 @@
 
 import pkgutil
 import importlib
+import inspect
 from typing import List, Dict, Any, TYPE_CHECKING
 from mxx.plugin_system.plugin import MxxPlugin
 
@@ -56,93 +57,129 @@ class PluginLoader:
                 except Exception as e:
                     print(f"Warning: Failed to load plugin {name}: {e}")
     
+    def _call_with_inspection(self, method, *args, **kwargs) -> Any:
+        """Call a method with signature inspection to pass only accepted parameters.
+        
+        Args:
+            method: Method to call
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+            
+        Returns:
+            Method result
+        """
+        try:
+            sig = inspect.signature(method)
+            
+            # Filter kwargs to only include parameters the method accepts
+            accepted_kwargs = {}
+            for key, value in kwargs.items():
+                if key in sig.parameters:
+                    accepted_kwargs[key] = value
+            
+            return method(*args, **accepted_kwargs)
+        except Exception:
+            # Fallback: try with all kwargs
+            return method(*args, **kwargs)
+    
     def emit(self, hook_name: str, *args, **kwargs) -> None:
         """Emit a hook event to all plugins.
         
         Args:
             hook_name: Name of the hook event (e.g., "pre_ld_start")
             *args: Positional arguments for the hook
-            **kwargs: Keyword arguments for the hook
+            **kwargs: Keyword arguments for the hook (including vars if available)
         """
         for plugin in self.plugins:
             try:
-                plugin.hook(hook_name, *args, **kwargs)
+                method = getattr(plugin, f"hook_{hook_name}", None)
+                if method and callable(method):
+                    self._call_with_inspection(method, *args, **kwargs)
             except Exception as e:
                 print(f"Warning: Plugin hook '{hook_name}' failed: {e}")
     
-    def init(self) -> None:
-        """Initialize all plugins."""
+    def init(self, vars: Dict[str, str] = None) -> None:
+        """Initialize all plugins.
+        
+        Args:
+            vars: Optional variables from --var options
+        """
         for plugin in self.plugins:
             try:
-                plugin.init()
+                self._call_with_inspection(plugin.init, vars=vars)
             except Exception as e:
                 print(f"Warning: Plugin init failed: {e}")
     
-    def register_commands(self, cli_group) -> None:
+    def register_commands(self, cli_group, vars: Dict[str, str] = None) -> None:
         """Register commands from all plugins.
         
         Args:
             cli_group: Click group to register commands with
+            vars: Optional variables from --var options
         """
         for plugin in self.plugins:
             try:
-                plugin.register_commands(cli_group)
+                self._call_with_inspection(plugin.register_commands, cli_group, vars=vars)
             except Exception as e:
                 print(f"Warning: Plugin register_commands failed: {e}")
 
-    def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
+    def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
         """Call pre_profile_start on all plugins.
         
         Args:
             profile: Profile being started
             ctx: Runtime context
+            vars: Optional variables from --var options
         """
         for plugin in self.plugins:
             try:
-                plugin.pre_profile_start(profile, ctx)
+                self._call_with_inspection(plugin.pre_profile_start, profile, ctx, vars=vars)
             except Exception as e:
                 print(f"Warning: Plugin pre_profile_start failed: {e}")
     
-    def post_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
+    def post_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
         """Call post_profile_start on all plugins.
         
         Args:
             profile: Profile that was started
             ctx: Runtime context
+            vars: Optional variables from --var options
         """
         for plugin in self.plugins:
             try:
-                plugin.post_profile_start(profile, ctx)
+                self._call_with_inspection(plugin.post_profile_start, profile, ctx, vars=vars)
             except Exception as e:
                 print(f"Warning: Plugin post_profile_start failed: {e}")
     
-    def pre_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
+    def pre_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
         """Call pre_profile_kill on all plugins.
         
         Args:
             profile: Profile being killed
             ctx: Runtime context
+            vars: Optional variables from --var options
         """
         for plugin in self.plugins:
             try:
-                plugin.pre_profile_kill(profile, ctx)
+                self._call_with_inspection(plugin.pre_profile_kill, profile, ctx, vars=vars)
             except Exception as e:
                 print(f"Warning: Plugin pre_profile_kill failed: {e}")
     
-    def post_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
+    def post_profile_kill(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> None:
         """Call post_profile_kill on all plugins.
         
         Args:
             profile: Profile that was killed
             ctx: Runtime context
+            vars: Optional variables from --var options
         """
         for plugin in self.plugins:
             try:
-                plugin.post_profile_kill(profile, ctx)
+                self._call_with_inspection(plugin.post_profile_kill, profile, ctx, vars=vars)
             except Exception as e:
                 print(f"Warning: Plugin post_profile_kill failed: {e}")
     
-    def can_run_profile(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> bool:
+    def can_run_profile(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> bool:
         """Check if profile can run via all plugins.
         
         If any plugin returns False, the profile cannot run.
@@ -150,19 +187,21 @@ class PluginLoader:
         Args:
             profile: Profile to check
             ctx: Runtime context
+            vars: Optional variables from --var options
             
         Returns:
             True if all plugins allow running, False otherwise
         """
         for plugin in self.plugins:
             try:
-                if not plugin.can_run_profile(profile, ctx):
+                result = self._call_with_inspection(plugin.can_run_profile, profile, ctx, vars=vars)
+                if not result:
                     return False
             except Exception as e:
                 print(f"Warning: Plugin can_run_profile check failed: {e}")
         return True
     
-    def can_kill_profile(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> bool:
+    def can_kill_profile(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Dict[str, str] = None) -> bool:
         """Check if profile can be killed via all plugins.
         
         If any plugin returns False, the profile cannot be killed.
@@ -170,22 +209,27 @@ class PluginLoader:
         Args:
             profile: Profile to check
             ctx: Runtime context
+            vars: Optional variables from --var options
             
         Returns:
             True if all plugins allow killing, False otherwise
         """
         for plugin in self.plugins:
             try:
-                if not plugin.can_kill_profile(profile, ctx):
+                result = self._call_with_inspection(plugin.can_kill_profile, profile, ctx, vars=vars)
+                if not result:
                     return False
             except Exception as e:
                 print(f"Warning: Plugin can_kill_profile check failed: {e}")
         return True
     
-    def load_plugin_profiles(self) -> Dict[str, "MxxProfile"]:
+    def load_plugin_profiles(self, vars: Dict[str, str] = None) -> Dict[str, "MxxProfile"]:
         """Load profiles contributed by plugins.
         
         Calls get_profiles() on each plugin and aggregates the results.
+        
+        Args:
+            vars: Optional variables from --var options
         
         Returns:
             Dictionary mapping profile names to MxxProfile instances
@@ -195,7 +239,7 @@ class PluginLoader:
         
         for plugin in self.plugins:
             try:
-                profiles = plugin.get_profiles()
+                profiles = self._call_with_inspection(plugin.get_profiles, vars=vars)
                 if profiles:
                     self._plugin_profiles.update(profiles)
                     print(f"Loaded {len(profiles)} profile(s) from plugin: {plugin.__class__.__name__}")

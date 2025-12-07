@@ -18,7 +18,8 @@ def cli(ctx):
 cli.add_command(config.config)
 cli.add_command(run.run)
 
-# Initialize plugins and register their commands
+# Note: Plugin init and register_commands will get vars from context at runtime
+# For now, initialize without vars (vars are passed per-command via context)
 profile_resolver.plugin_loader.init()
 profile_resolver.plugin_loader.register_commands(cli)
 
