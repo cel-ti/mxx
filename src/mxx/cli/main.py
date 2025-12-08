@@ -34,7 +34,11 @@ def main():
     profile_resolver.plugin_loader.register_commands(cli)
     
     # Run Click with cleaned arguments
-    cli(cleaned_argv[1:], standalone_mode=False)
+    try:
+        cli(cleaned_argv[1:], standalone_mode=False)
+    except click.exceptions.NoArgsIsHelpError:
+        # Show help when no arguments provided
+        cli(['--help'], standalone_mode=False)
 
 
 if __name__ == "__main__":

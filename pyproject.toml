@@ -1,6 +1,6 @@
 [project]
 name = "mxx"
-version = "0.3.0"
+version = "0.3.1"
 description = "maa framework tools"
 readme = "README.md"
 authors = [
