@@ -12,6 +12,7 @@ Tracks profile completions per day to prevent duplicate runs.
 - **Automatic recording** - Marks completion (success or failure) after profile runs
 - **Reset capability** - Reset completion status with `--var reset-completion`
 - **Boolean flag support** - Use `--var by-completion` (no `=true` needed)
+- **Auto-next command** - `mxx run next` automatically runs the first incomplete profile
 
 ## Installation
 
@@ -96,6 +97,28 @@ mxx run up myprofile --var by-completion --var include-failed
 # Skips if ANY run exists today (status = true or false)
 ```
 
+### Auto-Run Next Incomplete Profile
+```bash
+# Automatically discover and run the first incomplete profile
+mxx run next
+# [CheckCompletion] Found 5 incomplete profiles out of 6 total.
+# [CheckCompletion] Running next incomplete profile: profile1
+# [CheckCompletion] Remaining: profile2, profile3, profile4, profile5
+# ... runs profile1 with --kill and --var by-completion ...
+
+# If all profiles completed
+mxx run next
+# [CheckCompletion] All 6 profiles already completed today.
+```
+
+The `next` command:
+- Automatically discovers all profiles from `~/.mxx/configs/`
+- Checks which profiles haven't been completed successfully today
+- Runs the first incomplete profile with `--kill` and `--var by-completion` automatically
+- Shows total and remaining incomplete profiles
+- Perfect for scheduled tasks that automatically work through all profiles
+- Run multiple times to process all incomplete profiles sequentially
+
 ## How It Works
 
 1. **Activation**: Plugin only activates when `--var by-completion` is passed
@@ -121,6 +144,13 @@ mxx run up myprofile --var by-completion --var include-failed
 - `true` = Successfully completed
 - `false` = Failed during execution
 - Files are organized by date: `~/.mxx/completion/2025-12-06.json`
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `mxx run up <profile> --var by-completion` | Run profile with completion tracking |
+| `mxx run next` | Auto-discover and run first incomplete profile |
 
 ## Available Flags
 
@@ -148,6 +178,18 @@ If the job runs multiple times accidentally, it will only execute once per day (
 
 Failed runs (status=false) won't prevent retries. Only successful runs (status=true) will skip execution.
 
+### Sequential Profile Processing
+```bash
+# Run in cron/scheduler - each run processes next incomplete profile
+0 */2 * * * mxx run next
+```
+
+Perfect for distributed execution:
+- First run: Processes profile 1
+- Second run: Processes profile 2 (profile 1 already completed)
+- Third run: Processes profile 3 (profiles 1-2 already completed)
+- Continues until all profiles completed
+
 ### Preventing Any Re-runs (Including Failed)
 ```bash
 # Run once per day regardless of success/failure
@@ -174,6 +216,40 @@ Or edit the file to remove specific profiles.
 ```
 
 Old completion files can be safely deleted - they're only checked for the current date.
+
+## Development
+
+### Project Structure
+
+```
+mxxp_check_completion/
+├── __init__.py          # Package initialization
+├── __plugin__.py        # Main plugin class and hooks
+├── manager.py           # CompletionManager - storage logic
+└── commands.py          # CLI command registration
+```
+
+**manager.py** - `CompletionManager` class:
+- Handles all JSON file operations
+- Methods: `load_completions()`, `save_completion()`, `is_completed()`, `reset_completion()`, `get_incomplete_profiles()`
+- Easily testable in isolation
+
+**commands.py** - CLI command registration:
+- `register_next_command()` - Registers `mxx run next` command
+- Separated for cleaner organization
+
+**__plugin__.py** - Plugin hooks:
+- `pre_profile_start()` - Check and skip if completed
+- `post_profile_start()` - Record completion status
+- `register_commands()` - Register CLI commands
+
+### Extending the Plugin
+
+To add new functionality:
+
+1. **Storage operations** → Add to `CompletionManager` in `manager.py`
+2. **CLI commands** → Add to `commands.py`
+3. **Profile hooks** → Add to `CheckCompletionPlugin` in `__plugin__.py`
 
 ## Integration with Other Plugins
 

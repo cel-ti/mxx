@@ -128,6 +128,18 @@ class ProfileRunner:
             print(f"Error starting profile: {e}")
             return False
     
+    def notify_profile_failure(self, profile: MxxProfile) -> None:
+        """Notify plugins that a profile has failed during lifetime.
+        
+        This is called when a profile fails after start_profile() has succeeded
+        but during the lifetime wait period.
+        
+        Args:
+            profile: The profile that failed
+        """
+        if self._plugin_loader:
+            self._plugin_loader.post_profile_start(profile, self.runtime)
+    
     def _start_ld(self, ld) -> None:
         """Start LD player.
         

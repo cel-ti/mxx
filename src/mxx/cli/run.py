@@ -68,6 +68,9 @@ def up(profiles: tuple[str, ...], waittime: int | None, kill: bool, kill_all: bo
                         current_context['profile_name'] = profile_name
                         profile_resolver.plugin_loader.set_context(current_context)
                         
+                        # Notify plugins of the failure (calls post_profile_start with failed=True context)
+                        runner.notify_profile_failure(profile)
+                        
                         click.echo(f"✗ Profile '{profile_name}' failed during execution", err=True)
                         sys.exit(1)
                     

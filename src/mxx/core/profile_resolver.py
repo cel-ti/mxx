@@ -140,6 +140,21 @@ class ProfileResolver:
         results.update(self.get_file_items())
         return results
     
+    def list_profiles(self) -> list[str]:
+        """List only full profile names (excluding .ld and .maa parts).
+        
+        Returns:
+            List of profile names
+        """
+        all_items = self.list_all_profiles()
+        # Filter out parts (.ld and .maa) and only include valid profiles
+        profiles = []
+        for name, (model, is_plugin, error) in all_items.items():
+            # Skip parts and failed loads
+            if not is_profile_part(name) and model is not None and error is None:
+                profiles.append(name)
+        return sorted(profiles)
+    
     @property
     def plugin_loader(self):
         """Get the plugin loader instance."""
