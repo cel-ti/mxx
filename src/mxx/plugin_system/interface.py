@@ -32,6 +32,35 @@ class PluginInterface:
             vars: Optional variables from --var options (if method accepts it)
         """
         pass
+    
+    def pre_command(self, command_name: str, ctx: "click.Context") -> None:
+        """Hook called before any command executes.
+        
+        Args:
+            command_name: Name of the command being executed
+            ctx: Click context object
+        """
+        pass
+    
+    def post_command(self, command_name: str, ctx: "click.Context", result: Any) -> None:
+        """Hook called after a command executes successfully.
+        
+        Args:
+            command_name: Name of the command that executed
+            ctx: Click context object
+            result: Return value from the command
+        """
+        pass
+    
+    def command_error(self, command_name: str, ctx: "click.Context", error: Exception) -> None:
+        """Hook called when a command raises an exception.
+        
+        Args:
+            command_name: Name of the command that failed
+            ctx: Click context object
+            error: Exception that was raised
+        """
+        pass
 
     def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any], vars: Optional[Dict[str, str]] = None) -> None:
         """Hook called before a profile starts.

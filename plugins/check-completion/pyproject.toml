@@ -1,6 +1,6 @@
 [project]
 name = "mxxp-check-completion"
-version = "0.1.6"
+version = "0.1.7"
 description = "Plugin to track and prevent duplicate profile runs per day"
 readme = "README.md"
 authors = [

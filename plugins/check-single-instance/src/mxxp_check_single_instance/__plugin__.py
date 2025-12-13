@@ -3,14 +3,25 @@
 import sys
 import os
 import psutil
+import click
 from mxx.plugin_system.plugin import MxxPlugin
 
 
 class CheckSingleInstancePlugin(MxxPlugin):
-    """Ensures only one instance of MXX is running at a time."""
+    """Ensures only one instance of MXX is running at a time when executing run commands."""
     
-    def init(self) -> None:
-        """Check for other running MXX instances and exit if found."""
+    def pre_command(self, command_name: str, ctx: click.Context) -> None:
+        """Check for other running MXX instances before executing run commands.
+        
+        Args:
+            command_name: Name of the command being executed
+            ctx: Click context
+        """
+        # Only check for run group commands
+        # Check if this command is under the 'run' group
+        if not self._is_run_command(ctx):
+            return
+        
         # Get current process and walk up to find mxx.exe if we're a child process
         current = psutil.Process()
         current_mxx_pid = None
@@ -44,6 +55,23 @@ class CheckSingleInstancePlugin(MxxPlugin):
             print(f"CheckSingleInstance: Found {len(mxx_processes)} other MXX instance(s) running.")
             print("CheckSingleInstance: Only one instance of MXX is allowed. Exiting...")
             sys.exit(1)
+    
+    def _is_run_command(self, ctx: click.Context) -> bool:
+        """Check if the current command is under the 'run' group.
+        
+        Args:
+            ctx: Click context
+            
+        Returns:
+            True if command is under run group, False otherwise
+        """
+        # Walk up the context chain to find parent groups
+        current = ctx
+        while current:
+            if hasattr(current, 'info_name') and current.info_name == 'run':
+                return True
+            current = current.parent
+        return False
 
 
 plugin = CheckSingleInstancePlugin()
