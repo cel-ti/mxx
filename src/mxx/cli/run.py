@@ -10,9 +10,11 @@ from mxx.core.runner import ProfileRunner
 
 
 @click.group(cls=PluginAwareGroup)
-def run():
+@click.pass_context
+def run(ctx):
     """Run profile commands."""
-    pass
+    # Initialize plugins with run group context for single-instance check
+    profile_resolver.plugin_loader.init(ctx=ctx)
 
 
 @run.command()

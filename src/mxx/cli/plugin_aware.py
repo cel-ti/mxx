@@ -44,7 +44,7 @@ class PluginAwareCommand(click.Command):
         
         # Pre-command hook
         if plugin_loader:
-            plugin_loader.emit('pre_command', command_name=self.name, ctx=ctx)
+            plugin_loader.pre_command(command_name=self.name, ctx=ctx)
         
         try:
             # Execute the actual command
@@ -52,14 +52,14 @@ class PluginAwareCommand(click.Command):
             
             # Post-command hook (success)
             if plugin_loader:
-                plugin_loader.emit('post_command', command_name=self.name, ctx=ctx, result=result)
+                plugin_loader.post_command(command_name=self.name, ctx=ctx, result=result)
             
             return result
             
         except Exception as e:
             # Command error hook
             if plugin_loader:
-                plugin_loader.emit('command_error', command_name=self.name, ctx=ctx, error=e)
+                plugin_loader.command_error(command_name=self.name, ctx=ctx, error=e)
             raise
 
 

@@ -107,12 +107,16 @@ class PluginLoader:
             except Exception as e:
                 print(f"Warning: Plugin hook '{hook_name}' failed: {e}")
     
-    def init(self) -> None:
-        """Initialize all plugins with context vars."""
+    def init(self, ctx=None) -> None:
+        """Initialize all plugins with context vars and Click context.
+        
+        Args:
+            ctx: Optional Click context
+        """
         vars_dict = self.context.get('vars', {})
         for plugin in self.plugins:
             try:
-                self._call_with_inspection(plugin.init, vars=vars_dict)
+                self._call_with_inspection(plugin.init, vars=vars_dict, ctx=ctx)
             except Exception as e:
                 print(f"Warning: Plugin init failed: {e}")
     
@@ -128,6 +132,47 @@ class PluginLoader:
                 self._call_with_inspection(plugin.register_commands, cli_group, vars=vars_dict)
             except Exception as e:
                 print(f"Warning: Plugin register_commands failed: {e}")
+    
+    def pre_command(self, command_name: str, ctx) -> None:
+        """Call pre_command on all plugins.
+        
+        Args:
+            command_name: Name of the command being executed
+            ctx: Click context
+        """
+        for plugin in self.plugins:
+            try:
+                self._call_with_inspection(plugin.pre_command, command_name, ctx)
+            except Exception as e:
+                print(f"Warning: Plugin pre_command failed: {e}")
+    
+    def post_command(self, command_name: str, ctx, result) -> None:
+        """Call post_command on all plugins.
+        
+        Args:
+            command_name: Name of the command that executed
+            ctx: Click context
+            result: Return value from the command
+        """
+        for plugin in self.plugins:
+            try:
+                self._call_with_inspection(plugin.post_command, command_name, ctx, result)
+            except Exception as e:
+                print(f"Warning: Plugin post_command failed: {e}")
+    
+    def command_error(self, command_name: str, ctx, error: Exception) -> None:
+        """Call command_error on all plugins.
+        
+        Args:
+            command_name: Name of the command that failed
+            ctx: Click context
+            error: Exception that was raised
+        """
+        for plugin in self.plugins:
+            try:
+                self._call_with_inspection(plugin.command_error, command_name, ctx, error)
+            except Exception as e:
+                print(f"Warning: Plugin command_error handler failed: {e}")
 
     def pre_profile_start(self, profile: "MxxProfile", ctx: Dict[str, Any]) -> None:
         """Call pre_profile_start on all plugins.

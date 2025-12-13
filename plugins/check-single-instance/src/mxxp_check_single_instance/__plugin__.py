@@ -4,22 +4,23 @@ import sys
 import os
 import psutil
 import click
+from typing import Optional
 from mxx.plugin_system.plugin import MxxPlugin
 
 
 class CheckSingleInstancePlugin(MxxPlugin):
-    """Ensures only one instance of MXX is running at a time when executing run commands."""
+    """Ensures only one instance of MXX is running at a time."""
     
-    def pre_command(self, command_name: str, ctx: click.Context) -> None:
-        """Check for other running MXX instances before executing run commands.
+    def init(self, ctx: Optional[click.Context] = None) -> None:
+        """Check for other running MXX instances and exit if found.
+        
+        Only checks if invoked from the 'run' command group.
         
         Args:
-            command_name: Name of the command being executed
-            ctx: Click context
+            ctx: Optional Click context to determine command group
         """
-        # Only check for run group commands
-        # Check if this command is under the 'run' group
-        if not self._is_run_command(ctx):
+        # Only check if we're in the run group
+        if ctx and not self._is_run_group(ctx):
             return
         
         # Get current process and walk up to find mxx.exe if we're a child process
@@ -56,16 +57,15 @@ class CheckSingleInstancePlugin(MxxPlugin):
             print("CheckSingleInstance: Only one instance of MXX is allowed. Exiting...")
             sys.exit(1)
     
-    def _is_run_command(self, ctx: click.Context) -> bool:
-        """Check if the current command is under the 'run' group.
+    def _is_run_group(self, ctx: click.Context) -> bool:
+        """Check if context is within the run command group.
         
         Args:
             ctx: Click context
             
         Returns:
-            True if command is under run group, False otherwise
+            True if in run group, False otherwise
         """
-        # Walk up the context chain to find parent groups
         current = ctx
         while current:
             if hasattr(current, 'info_name') and current.info_name == 'run':

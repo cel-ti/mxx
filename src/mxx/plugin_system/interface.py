@@ -16,11 +16,12 @@ class PluginInterface:
     what parameters your plugin needs.
     """
     
-    def init(self, vars: Optional[Dict[str, str]] = None) -> None:
+    def init(self, vars: Optional[Dict[str, str]] = None, ctx: Optional["click.Context"] = None) -> None:
         """Initialize the plugin.
         
         Args:
             vars: Optional variables from --var options (if method accepts it)
+            ctx: Optional Click context (if method accepts it)
         """
         pass
     
