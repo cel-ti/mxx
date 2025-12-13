@@ -10,7 +10,7 @@ from typing import Dict, Any
 
 from mxx.plugin_system.plugin import MxxPlugin
 from .manager import CompletionManager
-from .commands import register_next_command
+from .commands import register_next_command, register_notify_command
 
 
 class CheckCompletionPlugin(MxxPlugin):
@@ -87,6 +87,15 @@ class CheckCompletionPlugin(MxxPlugin):
         # Check if profile failed during execution
         failed = ctx.get('profile_failed', False)
         
+        # Check if profile is in notify list (should be treated as successful)
+        in_notify_list = self.manager.is_in_notify_list(profile_name)
+        
+        # If in notify list, treat as successful even if it failed
+        if in_notify_list and failed:
+            print(f"[CheckCompletion] Profile '{profile_name}' is in notify list.")
+            print(f"[CheckCompletion] Treating early exit as successful completion.")
+            failed = False
+        
         # Save the appropriate status
         self.manager.save_completion(profile_name, success=not failed)
         
@@ -110,8 +119,9 @@ class CheckCompletionPlugin(MxxPlugin):
         # Import here to avoid issues during plugin discovery
         from mxx.cli.run import run
         
-        # Register the 'next' command under the 'run' group
+        # Register commands under the 'run' group
         register_next_command(run, self.manager)
+        register_notify_command(run, self.manager)
 
 
 plugin = CheckCompletionPlugin()

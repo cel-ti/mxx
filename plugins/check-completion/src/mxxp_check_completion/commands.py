@@ -7,6 +7,44 @@ if TYPE_CHECKING:
     from .manager import CompletionManager
 
 
+def register_notify_command(run_group, manager: "CompletionManager"):
+    """Register the 'notify' command under the run group.
+    
+    Args:
+        run_group: The Click run command group
+        manager: CompletionManager instance
+    """
+    @run_group.command(name='notify')
+    @click.argument('profile', required=True)
+    def run_notify(profile: str):
+        """Mark a profile to be treated as successful even if processes exit early.
+        
+        This is useful when MAA has "quit when done" settings that would otherwise
+        be detected as failures. Profiles in the notify list will be marked as
+        successful instead of failed when processes exit during the lifetime period.
+        
+        \b
+        Example:
+            mxx run notify maa
+            
+        \b
+        This will:
+        - Add 'maa' to today's notify list
+        - When 'maa' runs and MAA quits, mark it as successful instead of failed
+        - Prevent repeated runs of profiles that intentionally quit early
+        
+        Args:
+            profile: Name of the profile to add to notify list
+        """
+        manager.add_to_notify_list(profile)
+        notify_file = manager.get_notify_file()
+        notify_list = manager.load_notify_list()
+        
+        click.echo(f"[CheckCompletion] Added '{profile}' to today's notify list.")
+        click.echo(f"[CheckCompletion] Notify file: {notify_file}")
+        click.echo(f"[CheckCompletion] Current notify list: {', '.join(notify_list)}")
+
+
 def register_next_command(run_group, manager: "CompletionManager"):
     """Register the 'next' command under the run group.
     

@@ -35,6 +35,19 @@ class CompletionManager:
             date = datetime.now().strftime("%Y-%m-%d")
         return self.completion_dir / f"{date}.json"
     
+    def get_notify_file(self, date: Optional[str] = None) -> Path:
+        """Get the notify file path for a specific date.
+        
+        Args:
+            date: Date string (YYYY-MM-DD), defaults to today
+            
+        Returns:
+            Path to the notify JSON file
+        """
+        if date is None:
+            date = datetime.now().strftime("%Y-%m-%d")
+        return self.completion_dir / f"{date}.notify.json"
+    
     def load_completions(self, date: Optional[str] = None) -> Dict[str, bool]:
         """Load completion records for a specific date.
         
@@ -150,3 +163,55 @@ class CompletionManager:
         
         # Return never-run profiles first, failed profiles last
         return never_run + failed
+    
+    def load_notify_list(self, date: Optional[str] = None) -> List[str]:
+        """Load the notify list for a specific date.
+        
+        Args:
+            date: Date string (YYYY-MM-DD), defaults to today
+            
+        Returns:
+            List of profile names that should be treated as successful on early exit
+        """
+        notify_file = self.get_notify_file(date)
+        if notify_file.exists():
+            try:
+                with open(notify_file, 'r') as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        return data
+                    return []
+            except (json.JSONDecodeError, IOError):
+                return []
+        return []
+    
+    def add_to_notify_list(self, profile_name: str, date: Optional[str] = None) -> None:
+        """Add a profile to the notify list.
+        
+        Args:
+            profile_name: Name of the profile to add
+            date: Date string (YYYY-MM-DD), defaults to today
+        """
+        notify_list = self.load_notify_list(date)
+        if profile_name not in notify_list:
+            notify_list.append(profile_name)
+        
+        notify_file = self.get_notify_file(date)
+        try:
+            with open(notify_file, 'w') as f:
+                json.dump(notify_list, f, indent=2)
+        except IOError as e:
+            print(f"[CheckCompletion] Warning: Could not save notify list: {e}")
+    
+    def is_in_notify_list(self, profile_name: str, date: Optional[str] = None) -> bool:
+        """Check if a profile is in the notify list.
+        
+        Args:
+            profile_name: Name of the profile to check
+            date: Date string (YYYY-MM-DD), defaults to today
+            
+        Returns:
+            True if profile is in notify list, False otherwise
+        """
+        notify_list = self.load_notify_list(date)
+        return profile_name in notify_list
