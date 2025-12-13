@@ -119,15 +119,34 @@ class CompletionManager:
     def get_incomplete_profiles(self, all_profiles: List[str], include_failed: bool = False, date: Optional[str] = None) -> List[str]:
         """Get list of profiles that haven't been completed.
         
+        Failed profiles are sorted to the end of the list to give other profiles
+        a chance to run first, preventing infinite retries of a single failing profile.
+        
         Args:
             all_profiles: List of all available profile names
             include_failed: If True, exclude failed runs from incomplete list
             date: Date string (YYYY-MM-DD), defaults to today
             
         Returns:
-            List of profile names that are not completed
+            List of profile names that are not completed, with failed profiles at the end
         """
-        return [
-            profile for profile in all_profiles
-            if not self.is_completed(profile, include_failed=include_failed, date=date)
-        ]
+        completions = self.load_completions(date)
+        
+        # Separate profiles into never-run and failed
+        never_run = []
+        failed = []
+        
+        for profile in all_profiles:
+            if self.is_completed(profile, include_failed=include_failed, date=date):
+                continue
+            
+            status = completions.get(profile)
+            if status is False:
+                # Profile failed previously
+                failed.append(profile)
+            else:
+                # Profile never run or no record
+                never_run.append(profile)
+        
+        # Return never-run profiles first, failed profiles last
+        return never_run + failed
