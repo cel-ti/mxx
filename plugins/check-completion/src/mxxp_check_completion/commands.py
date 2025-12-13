@@ -7,16 +7,16 @@ if TYPE_CHECKING:
     from .manager import CompletionManager
 
 
-def register_notify_command(run_group, manager: "CompletionManager"):
-    """Register the 'notify' command under the run group.
+def register_notify_command(cli_group, manager: "CompletionManager"):
+    """Register the 'notify' command under the main CLI group.
     
     Args:
-        run_group: The Click run command group
+        cli_group: The main Click CLI group
         manager: CompletionManager instance
     """
-    @run_group.command(name='notify')
+    @cli_group.command(name='notify')
     @click.argument('profile', required=True)
-    def run_notify(profile: str):
+    def notify(profile: str):
         """Mark a profile to be treated as successful even if processes exit early.
         
         This is useful when MAA has "quit when done" settings that would otherwise
@@ -25,7 +25,7 @@ def register_notify_command(run_group, manager: "CompletionManager"):
         
         \b
         Example:
-            mxx run notify maa
+            mxx notify maa
             
         \b
         This will:

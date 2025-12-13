@@ -114,14 +114,16 @@ class CheckCompletionPlugin(MxxPlugin):
         This registers commands under their appropriate groups.
         
         Args:
-            cli_group: Main CLI group (not used, we target run group directly)
+            cli_group: Main CLI group
         """
         # Import here to avoid issues during plugin discovery
         from mxx.cli.run import run
         
-        # Register commands under the 'run' group
+        # Register 'next' command under the 'run' group
         register_next_command(run, self.manager)
-        register_notify_command(run, self.manager)
+        
+        # Register 'notify' command under the main CLI group
+        register_notify_command(cli_group, self.manager)
 
 
 plugin = CheckCompletionPlugin()
