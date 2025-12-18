@@ -1,6 +1,6 @@
 [project]
 name = "mxxp-check-single-instance"
-version = "0.1.8"
+version = "0.1.9"
 description = "Ensures only one instance of MXX is running at a time"
 readme = "README.md"
 authors = [

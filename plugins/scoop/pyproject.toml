@@ -1,6 +1,6 @@
 [project]
 name = "mxxp-scoop"
-version = "0.1.8"
+version = "0.1.9"
 description = "MXX plugin to resolve Scoop app paths"
 readme = "README.md"
 authors = [
